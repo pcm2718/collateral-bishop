@@ -1,6 +1,6 @@
 #!/bin/bash
 
-THREADS=7
+THREADS=3
 
 mpirun -np $THREADS bin/collateral-bishop
 #if [ $? -eq 0 ]

@@ -2,6 +2,7 @@
 #include<stdio.h>
 #include <mpi.h>
 
+#include <string.h>
 #include "herd.h"
 #include "histogram.h"
 
@@ -20,6 +21,7 @@
  * until I figure out how command line arguments work.
  */
 #define ITTR_COUNT 10
+#define GENE_SIZE 16
 #define HERD_SIZE 4
 #define POP_SIZE 16
 
@@ -53,7 +55,12 @@ main ( int argc , char** argv )
   /*
    * Build an instance of Histogram to contain the master histogram.
    */
-  //Histogram* master_histogram = NULL;
+  Histogram* master_histogram = NULL;
+
+  /*
+   * STDOUT comment.
+   */
+  printf ( "Process %i: Allocated master_histogram.\n" , pid );
 
   /*
    * Check the pid. It may be possible merge the ends of this
@@ -65,14 +72,13 @@ main ( int argc , char** argv )
        * If the pid is 0, then the process is responsible for
        * loading the master histogram and sending copies to
        * all other processes.
-       *
-       * I may replace some code here with special MPI stuff for
-       * sending structures.
        */
 
 
       /*
        * Read the contents of MASTER_FILENAME into master_str.
+       *
+       * Verify this area.
        */
       size_t transmit_size = 0;
       char* master_str = NULL;
@@ -95,11 +101,17 @@ main ( int argc , char** argv )
               if ( transmit_size == 0 )
                 return EXIT_FAILURE;
               else
-                master_str[transmit_size] = '\0';
+                master_str[++transmit_size] = '\0';
             }
 
           fclose ( master_file );
         }
+
+      /*
+       * STDOUT comment.
+       */
+      printf ( "Process 0: Master histogram loaded. Buffer has size %zu, and is as follows:\n" , transmit_size );
+      puts ( master_str );
       
       /*
        * Send the size of master_str and then master_str itself to
@@ -109,21 +121,27 @@ main ( int argc , char** argv )
         {
           MPI_Send ( &transmit_size , 1 , MPI_UNSIGNED , i , 0 , MPI_COMM_WORLD );
           MPI_Send ( master_str , transmit_size , MPI_CHAR , i , 0 , MPI_COMM_WORLD );
+
+          /*
+           * STDOUT comment.
+           */
+          printf ( "Process 0: Master histogram sent to process %i.\n" , i );
         }
 
       /*
        * Construct a histogram from master_str.
        */
-      //master_histogram = convert_ppm_to_histogram ( master_str );
+      master_histogram = convert_ppm_to_histogram ( master_str );
 
       /*
-       * Deallocate the buffer containing the contents of
-       * MASTER_FILENAME.
+       * STDOUT comment.
        */
-      //printf ( "Process %i:\n" , pid );
-      //printf ( "Size %zu:\n" , transmit_size );
-      //puts ( master_str );
-      //free ( master_str );
+      //printf ( "Process 0: Reconstituted master histogram.\n" );
+
+      /*
+       * Deallocate of master_str.
+       */
+      free ( master_str );
     }
   else
     {
@@ -132,9 +150,6 @@ main ( int argc , char** argv )
        * receipt of the data comprising master histogram.
        * After receiving the histogram data, the process
        * reconstitutes it into a Histogram structure.
-       *
-       * I may replace some code here with special MPI stuff for
-       * sending structures.
        */
 
 
@@ -143,6 +158,11 @@ main ( int argc , char** argv )
        */
       size_t receive_size = 0;
       MPI_Recv ( &receive_size , 1 , MPI_UNSIGNED , 0 , 0 , MPI_COMM_WORLD , MPI_STATUS_IGNORE );
+
+      /*
+       * STDOUT comment.
+       */
+      printf ( "Process %i: Master histogram size received from process 0. Size is %zu.\n" , pid , receive_size );
 
       /*
        * Create a buffer of size receive_size to hold master_str.
@@ -155,23 +175,35 @@ main ( int argc , char** argv )
       MPI_Recv ( master_str , receive_size , MPI_CHAR , 0 , 0 , MPI_COMM_WORLD , MPI_STATUS_IGNORE );
 
       /*
+       * STDOUT comment.
+       */
+      printf ( "Process %i: Master histogram received from process 0. Buffer is as follows:\n" , pid );
+      puts ( master_str );
+
+      /*
        * Construct a histogram from master_str.
        */
-      //master_histogram = convert_ppm_to_histogram ( master_str );
+      master_histogram = convert_ppm_to_histogram ( master_str );
+
+      /*
+       * STDOUT comment.
+       */
+      printf ( "Process 0: Reconstituted master histogram.\n" );
 
       /*
        * Free the buffer holding master_str.
        */
-      //printf ( "Process %i:\n" , pid );
-      //printf ( "Size %zu:\n" , receive_size );
-      //puts ( master_str );
-      //free ( master_str );
+      free ( master_str );
     }
+
+  /*
+   * By this point in the program, the local node has a copy of the
+   * master histogram.
+   */
 
   /*
    * Print the histogram for testing purposes.
    */
-  /*
   printf ( "Node %i, master histogram:\n", pid );
   for ( unsigned long j = 0 ; j < master_histogram->y_span ; ++j )
     {
@@ -180,25 +212,27 @@ main ( int argc , char** argv )
       printf ( "\n" );
     }
   printf ( "\n\n" );
-  */
 
 
   /*
-   * Create a new herd.
+   * Create a new local herd with:
+   *    genes of size GENE_SIZE,
+   *    a core herd of size HERD_SIZE,
+   *    a maximum population os size POP_Size.
    */
-  Herd* herd = build_herd ( HERD_SIZE , POP_SIZE );
+  //Herd* local_herd = build_herd ( GENE_SIZE , HERD_SIZE , POP_SIZE );
 
   /*
-   * Fill the herd proper with random genes.
+   * Fill the core herd with random genes.
    */
-  herd = herd_randomize_herd ( herd );
+  //local_herd = herd_randomize_herd ( local_herd );
 
 
   /*
    * Start the genetic algorithm.
    *
    * I need a good way of stoping the algorithm synchronously and
-   * criteria for doing so.
+   * criteria for doing so. Right now its just an itteration count.
    *
    * Figure out command line arguments while I'm at it.
    */
@@ -207,40 +241,112 @@ main ( int argc , char** argv )
       /*
        * Mate.
        */
-      //herd_mate_random ( herd );
+      //herd_mate_random ( local_herd );
 
 
       /*
        * Mutate.
        */
-      //herd_mutate_offspring ( herd );
+      //herd_mutate_offspring ( local_herd );
 
 
       /*
        * Migrate.
        */
       //Herd* out_herd = build_herd ( HERD_SIZE , HERD_SIZE );
-      //out_herd = herd_emmigrate ( herd , out_herd );
+      //out_herd = herd_emmigrate ( local_herd , out_herd );
       //Herd* in_herd = out_herd;
-      //herd_immigrate ( herd , in_herd );
+      //herd_immigrate ( local_herd , in_herd );
       //free_herd ( in_herd );
 
       /*
        * Evaluate.
        */
-      //herd_sort_fitness ( herd );
+      //herd_sort_fitness ( local_herd );
 
 
       /*
        * Cull. EX-TERMINATE! EX-TERMINATE!
        */
-      //herd_cull_fitness ( herd );
+      //herd_cull_fitness ( local_herd );
     }
 
   /*
-   * Free the herd.
+   * By this point in the program, each node has executed its own
+   * genetic algorithm and has developed its own best solution.
    */
-  free_herd ( herd );
+
+
+  /*
+   * Check the pid. It may be possible merge the ends of this
+   * conditional.
+   */
+  if ( pid == 0 )
+    {
+      /*
+       * If the pid is 0, then the process needs to collect the best
+       * solutions from the other nodes and pick the best one of
+       * these solutions as the result of the genetic algorithm.
+       */
+
+
+      /*
+       * Build a herd to contain the best solutions.
+       */
+      //Herd* best_herd = build_herd ( GENE_SIZE , ps_count , ps_count );
+
+      /*
+       * Get the best solution from the local herd and place it in
+       * best_genes.
+       */
+      //memcpy ( best_herd->herd_list[0] , local_herd->herd_list[0] , local_herd->gene_size );
+
+      /*
+       * Receive the best solution from every other node.
+       */
+      for ( int i = 1 ; i < ps_count ; ++i )
+        {
+          //MPI_Recv ( best_herd->herd_list[i] , best_herd->gene_size , MPI_CHAR , i , 0 , MPI_COMM_WORLD , MPI_STATUS_IGNORE );
+        }
+
+      /*
+       * Sort the best solutions to find *the* best solution.
+       */
+      //herd_sort_fitness ( best_herd );
+
+      /*
+       * The best solution has been sorted to best_herd->herd_list[0]
+       * as a result of the call to herd_sort_fitness. Copy it out
+       * to best_gene.
+       */
+      //unsigned char* best_gene = malloc ( sizeof ( unsigned char ) * local_herd->gene_size );
+      //memcpy ( best_gene , best_herd->herd_list[0] , local_herd->gene_size );
+
+      /*
+       * Free best_herd.
+       */
+      //free_herd ( best_herd );
+
+      /*
+       * Print the best gene to stdout.
+       */
+      for ( int i = 0 ; i < GENE_SIZE ; ++i );
+        //putchar ( best_gene[i] );
+    }
+  else
+    {
+      /*
+       * If the pid is not 0, the the process needs to send its best
+       * solution to process 0 for processing.
+       */
+      //MPI_Send ( local_herd->herd_list[0] , local_herd->gene_size , MPI_CHAR , 0 , 0 , MPI_COMM_WORLD );
+    }
+
+
+  /*
+   * Free the local herd.
+   */
+  //free_herd ( local_herd );
 
 
   /*

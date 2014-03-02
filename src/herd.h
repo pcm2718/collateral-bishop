@@ -9,6 +9,8 @@
 
 struct herd
 {
+  unsigned int gene_size;
+
   unsigned int herd_size;
   unsigned char** herd_list;
 
@@ -20,7 +22,7 @@ typedef struct herd Herd;
 
 
 Herd*
-build_herd ( unsigned int const herd_size , unsigned int const pop_size );
+build_herd ( unsigned int const gene_size, unsigned int const herd_size , unsigned int const pop_size );
 
 
 
