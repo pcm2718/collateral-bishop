@@ -2,6 +2,7 @@
 #include<stdio.h>
 #include <mpi.h>
 
+#include "herd.h"
 #include "histogram.h"
 
 
@@ -19,7 +20,8 @@
  * until I figure out how command line arguments work.
  */
 #define ITTR_COUNT 10
-#define POP_SIZE 4
+#define HERD_SIZE 4
+#define POP_SIZE 16
 
 
 
@@ -54,7 +56,8 @@ main ( int argc , char** argv )
   //Histogram* master_histogram = NULL;
 
   /*
-   * Check the pid.
+   * Check the pid. It may be possible merge the ends of this
+   * conditional.
    */
   if ( pid == 0 )
     {
@@ -92,8 +95,9 @@ main ( int argc , char** argv )
               if ( transmit_size == 0 )
                 return EXIT_FAILURE;
               else
-                master_str[++transmit_size] = '\0';
+                master_str[transmit_size] = '\0';
             }
+
           fclose ( master_file );
         }
       
@@ -108,8 +112,7 @@ main ( int argc , char** argv )
         }
 
       /*
-       * Construct the master histogram from the string containing
-       * it.
+       * Construct a histogram from master_str.
        */
       //master_histogram = convert_ppm_to_histogram ( master_str );
 
@@ -152,9 +155,9 @@ main ( int argc , char** argv )
       MPI_Recv ( master_str , receive_size , MPI_CHAR , 0 , 0 , MPI_COMM_WORLD , MPI_STATUS_IGNORE );
 
       /*
-       * Construct a Histogram structure containing the master
-       * histogram data.
+       * Construct a histogram from master_str.
        */
+      //master_histogram = convert_ppm_to_histogram ( master_str );
 
       /*
        * Free the buffer holding master_str.
@@ -181,8 +184,14 @@ main ( int argc , char** argv )
 
 
   /*
-   * Generate an initial population of random genes of size POP_SIZE.
+   * Create a new herd.
    */
+  Herd* herd = build_herd ( HERD_SIZE , POP_SIZE );
+
+  /*
+   * Fill the herd proper with random genes.
+   */
+  herd = herd_randomize_herd ( herd );
 
 
   /*
@@ -198,22 +207,40 @@ main ( int argc , char** argv )
       /*
        * Mate.
        */
+      //herd_mate_random ( herd );
 
 
       /*
        * Mutate.
        */
+      //herd_mutate_offspring ( herd );
 
 
       /*
        * Migrate.
        */
+      //Herd* out_herd = build_herd ( HERD_SIZE , HERD_SIZE );
+      //out_herd = herd_emmigrate ( herd , out_herd );
+      //Herd* in_herd = out_herd;
+      //herd_immigrate ( herd , in_herd );
+      //free_herd ( in_herd );
+
+      /*
+       * Evaluate.
+       */
+      //herd_sort_fitness ( herd );
 
 
       /*
        * Cull. EX-TERMINATE! EX-TERMINATE!
        */
+      //herd_cull_fitness ( herd );
     }
+
+  /*
+   * Free the herd.
+   */
+  free_herd ( herd );
 
 
   /*
