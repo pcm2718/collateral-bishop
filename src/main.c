@@ -58,11 +58,6 @@ main ( int argc , char** argv )
   Histogram* master_histogram = NULL;
 
   /*
-   * STDOUT comment.
-   */
-  printf ( "Process %i: Allocated master_histogram.\n" , pid );
-
-  /*
    * Check the pid. It may be possible merge the ends of this
    * conditional.
    */
@@ -108,12 +103,6 @@ main ( int argc , char** argv )
         }
 
       /*
-       * STDOUT comment.
-       */
-      printf ( "Process 0: Master histogram loaded. Buffer has size %zu, and is as follows:\n" , transmit_size );
-      puts ( master_str );
-      
-      /*
        * Send the size of master_str and then master_str itself to
        * all other processes.
        */
@@ -121,22 +110,12 @@ main ( int argc , char** argv )
         {
           MPI_Send ( &transmit_size , 1 , MPI_UNSIGNED , i , 0 , MPI_COMM_WORLD );
           MPI_Send ( master_str , transmit_size , MPI_CHAR , i , 0 , MPI_COMM_WORLD );
-
-          /*
-           * STDOUT comment.
-           */
-          printf ( "Process 0: Master histogram sent to process %i.\n" , i );
         }
 
       /*
        * Construct a histogram from master_str.
        */
       master_histogram = convert_ppm_to_histogram ( master_str );
-
-      /*
-       * STDOUT comment.
-       */
-      //printf ( "Process 0: Reconstituted master histogram.\n" );
 
       /*
        * Deallocate of master_str.
@@ -160,11 +139,6 @@ main ( int argc , char** argv )
       MPI_Recv ( &receive_size , 1 , MPI_UNSIGNED , 0 , 0 , MPI_COMM_WORLD , MPI_STATUS_IGNORE );
 
       /*
-       * STDOUT comment.
-       */
-      printf ( "Process %i: Master histogram size received from process 0. Size is %zu.\n" , pid , receive_size );
-
-      /*
        * Create a buffer of size receive_size to hold master_str.
        */
       char* master_str = malloc ( sizeof ( char ) * receive_size );
@@ -175,20 +149,9 @@ main ( int argc , char** argv )
       MPI_Recv ( master_str , receive_size , MPI_CHAR , 0 , 0 , MPI_COMM_WORLD , MPI_STATUS_IGNORE );
 
       /*
-       * STDOUT comment.
-       */
-      printf ( "Process %i: Master histogram received from process 0. Buffer is as follows:\n" , pid );
-      puts ( master_str );
-
-      /*
        * Construct a histogram from master_str.
        */
       master_histogram = convert_ppm_to_histogram ( master_str );
-
-      /*
-       * STDOUT comment.
-       */
-      printf ( "Process 0: Reconstituted master histogram.\n" );
 
       /*
        * Free the buffer holding master_str.

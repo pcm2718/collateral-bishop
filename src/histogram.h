@@ -5,6 +5,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <complex.h>
 
 
@@ -54,7 +55,7 @@ free_histogram ( Histogram * histogram );
 
 
 Histogram*
-convert_ppm_to_histogram ( char const * const ppm );
+convert_ppm_to_histogram ( char * const ppm );
 
 
 

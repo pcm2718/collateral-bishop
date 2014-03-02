@@ -5,7 +5,7 @@
 Histogram*
 build_histogram ( float complex const min_point , float complex const max_point , unsigned int const x_span , unsigned int const y_span , unsigned short const scale )
 {
-  Histogram* histogram = malloc ( sizeof ( histogram ) );
+  Histogram* histogram = malloc ( sizeof ( Histogram ) );
 
   histogram->min_point = min_point;
   histogram->max_point = max_point;
@@ -14,11 +14,6 @@ build_histogram ( float complex const min_point , float complex const max_point 
 
   histogram->scale = scale;
   histogram->data = calloc ( x_span * y_span , sizeof ( unsigned short ) );
-
-  printf ( "\n\nHistogram Created:\n" );
-  printf ( "\tx_span: %u\n" , x_span );
-  printf ( "\ty_span: %u\n" , y_span );
-  printf ( "\n" );
 
   return histogram;
 };
@@ -36,34 +31,29 @@ free_histogram ( Histogram* histogram )
 
 
 Histogram*
-convert_ppm_to_histogram ( char const * const ppm )
+convert_ppm_to_histogram ( char * const ppm )
 {
   /*
-   * The pointer to our current position in the string.
+   * Check for P2 tag at top of file. If the P2 tag is not present,
+   * return NULL.
    */
-  char const * str = ppm;
+  if ( strncmp ( "P2" , strtok ( ppm , "\n" ) , 2 ) )
+    return NULL;
 
   /*
-   * Ignore first line. HACK!
-   */
-  str += 3;
-
-  /*
-   * Parse x_span and y_span. HACK!
+   * Parse x_span and y_span.
    */
   unsigned int x_span = 0;
   unsigned int y_span = 0;
 
-  sscanf ( str , "%u %u" , &x_span , &y_span);
-
-  str += 6;
+  sscanf ( strtok ( NULL , "\n" ) , "%u %u" , &x_span , &y_span);
 
   /*
    * Parse scale.
    */
   unsigned short scale = 0;
 
-  sscanf ( str , "%hu" , &scale);
+  sscanf ( strtok ( NULL , "\n" ) , "%hu" , &scale );
 
   /*
    * Create histogram.
@@ -73,6 +63,19 @@ convert_ppm_to_histogram ( char const * const ppm )
   /*
    * Parse the actual histogram data.
    */
+
+  for ( unsigned int j = 0 ; j < histogram->y_span ; ++j )
+    {
+      for ( unsigned int i = 0 ; i < histogram->x_span ; ++i )
+        {
+          unsigned short tmp = 0;
+          /*
+           * sscanf may be inefficeint, look into strtol
+           */
+          sscanf ( strtok ( NULL , " \n" ) , "%hu" , &tmp );
+          histogram->data[i + j * histogram->x_span] = tmp;
+        }
+    }
 
   /*
    * Return histogram.
