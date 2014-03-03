@@ -83,10 +83,28 @@ convert_ppm_to_histogram ( char * const ppm )
 
 
 
-/*
 void
-convert_histogram_to_ppm ( Histogram const * const histogram , FILE* outfile)
+convert_histogram_to_ppm ( Histogram const * const histogram , FILE* result_file )
 {
-  return;
+  /*
+   * Write P2 tag to file.
+   */
+  fprintf ( result_file , "P2\n" );
+
+  /*
+   * Write x_span and y_span to file.
+   */
+  fprintf ( result_file , "%u %u\n" , histogram->x_span , histogram->y_span );
+
+  /*
+   * Write scale to file.
+   */
+  fprintf ( result_file , "%hu\n" , histogram->scale );
+
+  for ( unsigned int j = 0 ; j < histogram->y_span ; ++j )
+    {
+      for ( unsigned int i = 0 ; i < histogram->x_span ; ++i )
+        fprintf ( result_file , "%hu " , histogram->data[i + j*histogram->x_span] );
+      fputc ( '\n' , result_file );
+    }
 };
-*/

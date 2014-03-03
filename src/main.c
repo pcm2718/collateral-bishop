@@ -3,6 +3,7 @@
 #include <mpi.h>
 
 #include <string.h>
+#include "gene.h"
 #include "herd.h"
 #include "histogram.h"
 
@@ -12,7 +13,8 @@
  * This is the name of the file used to generate the master histogram
  * used for training in the genetic algorithm.
  */
-#define MASTER_FILENAME "home/test.ppm"
+#define MASTER_FILENAME "home/master.ppm"
+#define RESULT_FILENAME "home/result.ppm"
 
 
 
@@ -283,10 +285,25 @@ main ( int argc , char** argv )
       printf ( "\n" );
 
       /*
-       * Generate and write the ppm result of best_gene.
+       * Generate the result histogram.
        */
-      //Histogram* result_histogram = build_histogram ( master_histogram->x_span , master_histogram->y_span , master_histogram->scale );
-      //free_histogram ( master_histogram );
+      Histogram* result_histogram = build_histogram ( master_histogram->x_span , master_histogram->y_span , master_histogram->scale );
+      for ( unsigned int j = 0 ; j < result_histogram->y_span ; ++j )
+        for ( unsigned int i = 0 ; i < result_histogram->x_span ; ++i )
+          result_histogram->data[i + j*result_histogram->x_span] = gene_eval ( best_gene , i , j );
+
+      /*
+       * Write the result histogram to the file specified by
+       * RESULT_FILENAME.
+       */
+      FILE* result_file = fopen ( RESULT_FILENAME , "w" );
+      convert_histogram_to_ppm ( result_histogram , result_file );
+      fclose ( result_file );
+
+      /*
+       * Free the result histogram.
+       */
+      free_histogram ( result_histogram );
     }
   else
     {

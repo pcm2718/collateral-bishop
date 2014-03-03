@@ -9,7 +9,7 @@ LFLAGS=-g -std=c99 -lm -L obj
 all: obj/main.o obj/herd.o obj/gene.o obj/histogram.o
 	$(CC) $(LFLAGS) obj/main.o obj/herd.o obj/gene.o obj/histogram.o -o bin/collateral-bishop
 
-obj/main.o: src/main.c src/histogram.h src/herd.h
+obj/main.o: src/main.c src/histogram.h src/herd.h src/gene.h
 	$(CC) $(CFLAGS) -c src/main.c -o obj/main.o
 
 obj/herd.o: src/herd.c src/herd.h src/gene.h
