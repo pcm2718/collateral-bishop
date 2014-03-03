@@ -21,11 +21,11 @@
  * until I figure out how command line arguments work.
  */
 #define ITTR_COUNT 10
-#define GENE_SIZE 16
-#define HERD_SIZE 4
-#define POP_SIZE 16
-#define MIN_MUTATIONS 4
-#define MAX_MUTATIONS 8
+#define GENE_SIZE 1024
+#define HERD_SIZE 16
+#define POP_SIZE 64
+#define MIN_MUTATIONS 128
+#define MAX_MUTATIONS 256
 
 
 
@@ -285,6 +285,8 @@ main ( int argc , char** argv )
       /*
        * Generate and write the ppm result of best_gene.
        */
+      //Histogram* result_histogram = build_histogram ( master_histogram->x_span , master_histogram->y_span , master_histogram->scale );
+      //free_histogram ( master_histogram );
     }
   else
     {

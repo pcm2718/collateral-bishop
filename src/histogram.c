@@ -3,12 +3,10 @@
 
 
 Histogram*
-build_histogram ( float complex const min_point , float complex const max_point , unsigned int const x_span , unsigned int const y_span , unsigned short const scale )
+build_histogram ( unsigned int const x_span , unsigned int const y_span , unsigned short const scale )
 {
   Histogram* histogram = malloc ( sizeof ( Histogram ) );
 
-  histogram->min_point = min_point;
-  histogram->max_point = max_point;
   histogram->x_span = x_span;
   histogram->y_span = y_span;
 
@@ -58,7 +56,7 @@ convert_ppm_to_histogram ( char * const ppm )
   /*
    * Create histogram.
    */
-  Histogram* histogram = build_histogram ( DEFAULT_MIN_POINT , DEFAULT_MAX_POINT , x_span , y_span , scale );
+  Histogram* histogram = build_histogram ( x_span , y_span , scale );
 
   /*
    * Parse the actual histogram data.
