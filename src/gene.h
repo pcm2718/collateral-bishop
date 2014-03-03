@@ -5,6 +5,16 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
+
+
+
+#define ADD_OP '+'
+#define SUB_OP '-'
+#define MUL_OP '*'
+#define DIV_OP '/'
+
+#define OPS { ADD_OP , SUB_OP , MUL_OP , DIV_OP };
 
 
 
@@ -18,9 +28,6 @@ free_gene ( unsigned char* gene );
 
 
 
-/*
- * Note that this function could be implemented in terms of gene_mutate.
- */
 unsigned char*
 gene_randomize ( unsigned char * const gene, unsigned int const gene_size );
 

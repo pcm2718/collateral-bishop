@@ -2,7 +2,9 @@
 #include<stdio.h>
 #include <mpi.h>
 
+#include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "gene.h"
 #include "herd.h"
 #include "histogram.h"
@@ -22,8 +24,8 @@
  * The parameters for the genetic algorithm go here as constants
  * until I figure out how command line arguments work.
  */
-#define ITTR_COUNT 10
-#define GENE_SIZE 1024
+#define ITTR_COUNT 4
+#define GENE_SIZE 1023
 #define HERD_SIZE 16
 #define POP_SIZE 64
 #define MIN_MUTATIONS 128
@@ -54,6 +56,12 @@ main ( int argc , char** argv )
    * Get the pid.
    */
   MPI_Comm_rank ( MPI_COMM_WORLD , &pid );
+
+  /*
+   * Seed the random number generator based on the current time and
+   * the process id.
+   */
+  srand ( time ( NULL ) + pid );
 
 
   /*
@@ -278,8 +286,7 @@ main ( int argc , char** argv )
       /*
        * Print the best gene to stdout.
        */
-      printf ( "Best Gene:" );
-      printf ( "\t" );
+      printf ( "Best Gene:\n" );
       for ( int i = 0 ; i < GENE_SIZE ; ++i )
         putchar ( best_gene[i] );
       printf ( "\n" );
