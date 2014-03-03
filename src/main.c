@@ -74,8 +74,6 @@ main ( int argc , char** argv )
 
       /*
        * Read the contents of MASTER_FILENAME into master_str.
-       *
-       * Verify this area.
        */
       size_t transmit_size = 0;
       char* master_str = NULL;
@@ -115,7 +113,7 @@ main ( int argc , char** argv )
         }
 
       /*
-       * Construct a histogram from master_str.
+       * Construct the master histogram from master_str.
        */
       master_histogram = convert_ppm_to_histogram ( master_str );
 
@@ -151,7 +149,7 @@ main ( int argc , char** argv )
       MPI_Recv ( master_str , receive_size , MPI_CHAR , 0 , 0 , MPI_COMM_WORLD , MPI_STATUS_IGNORE );
 
       /*
-       * Construct a histogram from master_str.
+       * Construct the master histogram from master_str.
        */
       master_histogram = convert_ppm_to_histogram ( master_str );
 
@@ -171,7 +169,7 @@ main ( int argc , char** argv )
    * Create a new local herd with:
    *    genes of size GENE_SIZE,
    *    a core herd of size HERD_SIZE,
-   *    a maximum population os size POP_Size.
+   *    a maximum population os size POP_SIZE.
    */
   Herd* local_herd = build_herd ( GENE_SIZE , HERD_SIZE , POP_SIZE );
 
@@ -196,31 +194,22 @@ main ( int argc , char** argv )
        */
       local_herd = herd_mate ( local_herd );
 
-
       /*
        * Mutate.
        */
       local_herd = herd_mutate_offspring ( local_herd , MIN_MUTATIONS , MAX_MUTATIONS );
 
-
       /*
        * Migrate.
        */
-      //Herd* out_herd = build_herd ( HERD_SIZE , HERD_SIZE , GENE_SIZE );
-
-      //local_herd = herd_emmigrate ( local_herd , out_herd );
-
-      //Herd* in_herd = out_herd;
-
-      //local_herd = herd_immigrate ( local_herd , in_herd );
-
-      //free_herd ( in_herd );
+      MPI_Request request = MPI_REQUEST_NULL;
+      MPI_Isend ( local_herd->herd_list[0] , local_herd->gene_size , MPI_CHAR , ( pid + 1 ) % ps_count , 0 , MPI_COMM_WORLD , &request );
+      MPI_Recv ( local_herd->herd_list[0] , local_herd->gene_size , MPI_CHAR , ( pid - 1 ) % ps_count , 0 , MPI_COMM_WORLD , MPI_STATUS_IGNORE );
 
       /*
        * Evaluate.
        */
       local_herd = herd_sort_fitness ( local_herd , master_histogram );
-
 
       /*
        * Cull. EX-TERMINATE! EX-TERMINATE!
@@ -277,7 +266,7 @@ main ( int argc , char** argv )
        * to best_gene.
        */
       unsigned char* best_gene = malloc ( sizeof ( unsigned char ) * local_herd->gene_size );
-      memcpy ( best_gene , best_herd->herd_list[0] , local_herd->gene_size );
+      memcpy ( best_gene , best_herd->herd_list[0] , best_herd->gene_size );
 
       /*
        * Free best_herd.
@@ -292,6 +281,10 @@ main ( int argc , char** argv )
       for ( int i = 0 ; i < GENE_SIZE ; ++i )
         putchar ( best_gene[i] );
       printf ( "\n" );
+
+      /*
+       * Generate and write the ppm result of best_gene.
+       */
     }
   else
     {
