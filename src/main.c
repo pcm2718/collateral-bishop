@@ -24,6 +24,8 @@
 #define GENE_SIZE 16
 #define HERD_SIZE 4
 #define POP_SIZE 16
+#define MIN_MUTATIONS 4
+#define MAX_MUTATIONS 8
 
 
 
@@ -176,7 +178,7 @@ main ( int argc , char** argv )
   /*
    * Fill the core herd with random genes.
    */
-  //local_herd = herd_randomize_herd ( local_herd );
+  local_herd = herd_randomize_herd ( local_herd );
 
 
   /*
@@ -192,34 +194,38 @@ main ( int argc , char** argv )
       /*
        * Mate.
        */
-      //herd_mate_random ( local_herd );
+      local_herd = herd_mate ( local_herd );
 
 
       /*
        * Mutate.
        */
-      //herd_mutate_offspring ( local_herd );
+      local_herd = herd_mutate_offspring ( local_herd , MIN_MUTATIONS , MAX_MUTATIONS );
 
 
       /*
        * Migrate.
        */
-      //Herd* out_herd = build_herd ( HERD_SIZE , HERD_SIZE );
-      //out_herd = herd_emmigrate ( local_herd , out_herd );
+      //Herd* out_herd = build_herd ( HERD_SIZE , HERD_SIZE , GENE_SIZE );
+
+      //local_herd = herd_emmigrate ( local_herd , out_herd );
+
       //Herd* in_herd = out_herd;
-      //herd_immigrate ( local_herd , in_herd );
+
+      //local_herd = herd_immigrate ( local_herd , in_herd );
+
       //free_herd ( in_herd );
 
       /*
        * Evaluate.
        */
-      //herd_sort_fitness ( local_herd );
+      local_herd = herd_sort_fitness ( local_herd , master_histogram );
 
 
       /*
        * Cull. EX-TERMINATE! EX-TERMINATE!
        */
-      //herd_cull_fitness ( local_herd );
+      local_herd = herd_cull ( local_herd );
     }
 
   /*
@@ -244,45 +250,48 @@ main ( int argc , char** argv )
       /*
        * Build a herd to contain the best solutions.
        */
-      //Herd* best_herd = build_herd ( GENE_SIZE , ps_count , ps_count );
+      Herd* best_herd = build_herd ( GENE_SIZE , ps_count , ps_count );
 
       /*
        * Get the best solution from the local herd and place it in
        * best_genes.
        */
-      //memcpy ( best_herd->herd_list[0] , local_herd->herd_list[0] , local_herd->gene_size );
+      memcpy ( best_herd->herd_list[0] , local_herd->herd_list[0] , local_herd->gene_size );
 
       /*
        * Receive the best solution from every other node.
        */
       for ( int i = 1 ; i < ps_count ; ++i )
         {
-          //MPI_Recv ( best_herd->herd_list[i] , best_herd->gene_size , MPI_CHAR , i , 0 , MPI_COMM_WORLD , MPI_STATUS_IGNORE );
+          MPI_Recv ( best_herd->herd_list[i] , best_herd->gene_size , MPI_CHAR , i , 0 , MPI_COMM_WORLD , MPI_STATUS_IGNORE );
         }
 
       /*
        * Sort the best solutions to find *the* best solution.
        */
-      //herd_sort_fitness ( best_herd );
+      herd_sort_fitness ( best_herd , master_histogram );
 
       /*
        * The best solution has been sorted to best_herd->herd_list[0]
        * as a result of the call to herd_sort_fitness. Copy it out
        * to best_gene.
        */
-      //unsigned char* best_gene = malloc ( sizeof ( unsigned char ) * local_herd->gene_size );
-      //memcpy ( best_gene , best_herd->herd_list[0] , local_herd->gene_size );
+      unsigned char* best_gene = malloc ( sizeof ( unsigned char ) * local_herd->gene_size );
+      memcpy ( best_gene , best_herd->herd_list[0] , local_herd->gene_size );
 
       /*
        * Free best_herd.
        */
-      //free_herd ( best_herd );
+      free_herd ( best_herd );
 
       /*
        * Print the best gene to stdout.
        */
-      for ( int i = 0 ; i < GENE_SIZE ; ++i );
-        //putchar ( best_gene[i] );
+      printf ( "Best Gene:" );
+      printf ( "\t" );
+      for ( int i = 0 ; i < GENE_SIZE ; ++i )
+        putchar ( best_gene[i] );
+      printf ( "\n" );
     }
   else
     {
@@ -290,7 +299,7 @@ main ( int argc , char** argv )
        * If the pid is not 0, the the process needs to send its best
        * solution to process 0 for processing.
        */
-      //MPI_Send ( local_herd->herd_list[0] , local_herd->gene_size , MPI_CHAR , 0 , 0 , MPI_COMM_WORLD );
+      MPI_Send ( local_herd->herd_list[0] , local_herd->gene_size , MPI_CHAR , 0 , 0 , MPI_COMM_WORLD );
     }
 
 

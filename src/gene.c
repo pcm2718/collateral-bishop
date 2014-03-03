@@ -5,7 +5,9 @@
 unsigned char*
 build_gene ( unsigned int const gene_size )
 {
-  return malloc ( sizeof ( unsigned char ) * gene_size );
+  unsigned char* tmp = calloc ( gene_size , sizeof ( unsigned char ) );
+  strcat ( tmp , "xkcdxkcdxkcdxkcd" );
+  return tmp;
 };
 
 
@@ -19,24 +21,33 @@ free_gene ( unsigned char* gene )
 
 
 unsigned char*
-gene_randomize ( unsigned char* const gene, unsigned int const gene_size )
+gene_randomize ( unsigned char * const gene, unsigned int const gene_size )
 {
-  int x = gene_size + 1;
-  x++;
-  /*
-   * Declare array of gene bases.
-   */
-  //unsigned char bases [5] = BASES;
+  return gene_mutate ( gene , gene_size , gene_size , gene_size );
+};
 
-  /*
-   * Assign a random base to each spot in the gene.
-   * There might be a fast way to do this using SIMD.
-   */
-  //for ( unsigned int i = 0 ; i < gene_size ; ++i )
-  //  gene[i] = bases[ rand () % 5 ];
 
-  /*
-   * Return the gene pointer, now with random bases.
-   */
+
+unsigned char*
+gene_mate ( unsigned char const * const gene_1 , unsigned char const * const gene_2 , unsigned int const gene_size )
+{
+  unsigned char* child = malloc ( sizeof ( unsigned char ) * gene_size );
+  memcpy ( child , gene_1 , gene_size );
+  return child;
+};
+
+
+
+unsigned char*
+gene_mutate ( unsigned char * const gene , unsigned int const gene_size , unsigned int min_mutations , unsigned int max_mutations )
+{
   return gene;
+};
+
+
+
+unsigned short
+gene_eval ( unsigned char const * const gene , unsigned int x , unsigned int y )
+{
+  return 255;
 };

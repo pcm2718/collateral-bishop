@@ -4,7 +4,9 @@
 
 
 #include <stdlib.h>
+#include <math.h>
 #include "gene.h"
+#include "histogram.h"
 
 
 
@@ -37,18 +39,18 @@ herd_randomize_herd ( Herd * const herd );
 
 
 
+//Herd*
+//herd_randomize_pop ( Herd * const herd );
+
+
+
 Herd*
-herd_randomize_pop ( Herd * const herd );
+herd_mate ( Herd * const herd );
 
 
 
-void
-herd_mate_random ( Herd * const herd );
-
-
-
-void
-herd_mutate_offspring ( Herd * const herd );
+Herd*
+herd_mutate_offspring ( Herd * const herd , unsigned int const min_mutations , unsigned int const max_mutations);
 
 
 
@@ -57,18 +59,18 @@ herd_emmigrate ( Herd * const herd , Herd * const out_herd );
 
 
 
-void
+Herd*
 herd_immigrate ( Herd * const herd , Herd const * const in_herd );
 
 
 
-void
-herd_sort_fitness ( Herd * const herd );
+Herd*
+herd_cull ( Herd * const herd );
 
 
 
-void
-herd_cull_fitness ( Herd * const herd );
+Herd*
+herd_sort_fitness ( Herd * const herd , Histogram const * const master );
 
 
 
