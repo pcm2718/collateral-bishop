@@ -3,18 +3,22 @@
 
 
 
+#include <stdlib.h>
+
+
+
 unsigned char*
-build_gene ( unsigned int const gene_size )
+build_gene ( unsigned int const gene_size );
 
 
 
 void
-free_gene ( unsigned char* gene )
+free_gene ( unsigned char* gene );
 
 
 
 unsigned char*
-gene_randomize ( unsigned char* const gene, unsigned int const gene_size )
+gene_randomize ( unsigned char* const gene, unsigned int const gene_size );
 
 
 

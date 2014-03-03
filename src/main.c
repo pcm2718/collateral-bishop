@@ -96,7 +96,7 @@ main ( int argc , char** argv )
               if ( transmit_size == 0 )
                 return EXIT_FAILURE;
               else
-                master_str[++transmit_size] = '\0';
+                master_str[transmit_size] = '\0';
             }
 
           fclose ( master_file );
@@ -164,18 +164,6 @@ main ( int argc , char** argv )
    * master histogram.
    */
 
-  /*
-   * Print the histogram for testing purposes.
-   */
-  printf ( "Node %i, master histogram:\n", pid );
-  for ( unsigned long j = 0 ; j < master_histogram->y_span ; ++j )
-    {
-      for ( unsigned long i = 0 ; i < master_histogram->x_span ; ++i )
-        printf ( "%i " , master_histogram->data[i + j * master_histogram->y_span] );
-      printf ( "\n" );
-    }
-  printf ( "\n\n" );
-
 
   /*
    * Create a new local herd with:
@@ -183,7 +171,7 @@ main ( int argc , char** argv )
    *    a core herd of size HERD_SIZE,
    *    a maximum population os size POP_Size.
    */
-  //Herd* local_herd = build_herd ( GENE_SIZE , HERD_SIZE , POP_SIZE );
+  Herd* local_herd = build_herd ( GENE_SIZE , HERD_SIZE , POP_SIZE );
 
   /*
    * Fill the core herd with random genes.
@@ -309,7 +297,12 @@ main ( int argc , char** argv )
   /*
    * Free the local herd.
    */
-  //free_herd ( local_herd );
+  free_herd ( local_herd );
+
+  /*
+   * Free the master histogram.
+   */
+  free_histogram ( master_histogram );
 
 
   /*

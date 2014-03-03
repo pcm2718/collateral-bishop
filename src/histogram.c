@@ -82,3 +82,13 @@ convert_ppm_to_histogram ( char * const ppm )
    */
   return histogram;
 };
+
+
+
+/*
+void
+convert_histogram_to_ppm ( Histogram const * const histogram , FILE* outfile)
+{
+  return;
+};
+*/
