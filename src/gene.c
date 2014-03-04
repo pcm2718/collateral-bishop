@@ -121,6 +121,6 @@ gene_eval_r ( unsigned char const * const gene , unsigned int const gene_size , 
 long
 gene_eval ( unsigned char const * const gene , unsigned int const gene_size , unsigned int x , unsigned int y )
 {
-  //return gene_eval_r ( gene , gene_size , x , y , 0 , 1 , ceil ( log ( gene_size ) / log ( 2 ) ) );
-  return rand () % 256;
+  return gene_eval_r ( gene , gene_size , x , y , 0 , 1 , ceil ( log ( gene_size ) / log ( 2 ) ) );
+  //return rand () % 256;
 };

@@ -32,12 +32,12 @@
 #define MIN_MUTATIONS 8
 #define MAX_MUTATIONS 16
 */
-#define ITTR_COUNT 4
-#define GENE_SIZE 7
-#define HERD_SIZE 4
-#define POP_SIZE 16
-#define MIN_MUTATIONS 2
-#define MAX_MUTATIONS 4
+#define ITTR_COUNT 16
+#define GENE_SIZE 31
+#define HERD_SIZE 16
+#define POP_SIZE 64
+#define MIN_MUTATIONS 8
+#define MAX_MUTATIONS 16
 
 
 
@@ -257,7 +257,7 @@ main ( int argc , char** argv )
       /*
        * Build a herd to contain the best solutions.
        */
-      Herd* best_herd = build_herd ( GENE_SIZE , ps_count , ps_count );
+      Herd* best_herd = build_herd ( GENE_SIZE , ps_count , 0 );
 
       /*
        * Get the best solution from the local herd and place it in
