@@ -43,8 +43,8 @@ gene_mutate ( unsigned char * const gene , unsigned int const gene_size , unsign
 
 
 
-unsigned short
-gene_eval ( unsigned char const * const gene , unsigned int x , unsigned int y );
+long
+gene_eval ( unsigned char const * const gene , unsigned int gene_size , unsigned int x , unsigned int y );
 
 
 

@@ -139,7 +139,7 @@ herd_sort_fitness ( Herd * const herd , Histogram const * const master )
   for ( unsigned int k = 0 ; k < herd->herd_size + herd->pop_size ; ++k )
     for ( unsigned int j = 0 ; j < master->y_span ; ++j )
       for ( unsigned int i = 0 ; i < master->x_span ; ++i )
-        fitness[k] += powf ( gene_eval ( herd->herd_list[k] , i , j ) - master->data[i + j*master->x_span] , 2 );
+        fitness[k] += powf ( gene_eval ( herd->herd_list[k] , herd->gene_size , i , j ) - master->data[i + j*master->x_span] , 2 );
 
   /*
    * Sort both arrays in parallel, insertion sort.

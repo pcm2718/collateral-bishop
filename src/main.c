@@ -24,12 +24,20 @@
  * The parameters for the genetic algorithm go here as constants
  * until I figure out how command line arguments work.
  */
+/*
 #define ITTR_COUNT 4
-#define GENE_SIZE 1023
+#define GENE_SIZE 31
 #define HERD_SIZE 16
 #define POP_SIZE 64
-#define MIN_MUTATIONS 128
-#define MAX_MUTATIONS 256
+#define MIN_MUTATIONS 8
+#define MAX_MUTATIONS 16
+*/
+#define ITTR_COUNT 4
+#define GENE_SIZE 7
+#define HERD_SIZE 4
+#define POP_SIZE 16
+#define MIN_MUTATIONS 2
+#define MAX_MUTATIONS 4
 
 
 
@@ -297,7 +305,7 @@ main ( int argc , char** argv )
       Histogram* result_histogram = build_histogram ( master_histogram->x_span , master_histogram->y_span , master_histogram->scale );
       for ( unsigned int j = 0 ; j < result_histogram->y_span ; ++j )
         for ( unsigned int i = 0 ; i < result_histogram->x_span ; ++i )
-          result_histogram->data[i + j*result_histogram->x_span] = gene_eval ( best_gene , i , j );
+          result_histogram->data[i + j*result_histogram->x_span] = gene_eval ( best_gene , GENE_SIZE , i , j );
 
       /*
        * Write the result histogram to the file specified by
