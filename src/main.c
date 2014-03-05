@@ -16,7 +16,7 @@
  * used for training in the genetic algorithm.
  */
 #define MASTER_FILENAME "home/master.ppm"
-#define RESULT_FILENAME "home/result.ppm"
+#define RESULT_FILENAME "home/new_result.ppm"
 
 
 
@@ -33,11 +33,11 @@
 #define MAX_MUTATIONS 16
 */
 #define ITTR_COUNT 16
-#define GENE_SIZE 31
-#define HERD_SIZE 16
-#define POP_SIZE 64
-#define MIN_MUTATIONS 8
-#define MAX_MUTATIONS 16
+#define GENE_SIZE 15
+#define HERD_SIZE 8
+#define POP_SIZE 32
+#define MIN_MUTATIONS 4
+#define MAX_MUTATIONS 8
 
 
 
